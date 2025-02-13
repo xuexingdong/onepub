@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Onepub",
+  "version": "1.0",
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.baidu.com/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "permissions": ["tabs", "activeTab", "storage", "scripting"],
+  "host_permissions": ["*://*.xiaohongshu.com/*"]
+}
