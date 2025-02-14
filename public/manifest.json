@@ -13,5 +13,8 @@
     }
   ],
   "permissions": ["tabs", "activeTab", "storage", "scripting"],
-  "host_permissions": ["*://*.xiaohongshu.com/*"]
+  "host_permissions": ["*://*.xiaohongshu.com/*"],
+  "externally_connectable":{
+    "matches": ["http://localhost/*"]
+  }
 }
