@@ -8,13 +8,17 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://www.baidu.com/*"],
-      "js": ["content.js"]
+      "matches": ["*://*.xiaohongshu.com/*"],
+      "js": ["xhs.js"]
+    },
+    {
+      "matches": ["*://*.x.com/*"],
+      "js": ["x.js"]
     }
   ],
   "permissions": ["tabs", "activeTab", "storage", "scripting"],
-  "host_permissions": ["*://*.xiaohongshu.com/*"],
-  "externally_connectable":{
+  "host_permissions": ["*://*.xiaohongshu.com/*", "*://*.x.com/*"],
+  "externally_connectable": {
     "matches": ["http://localhost/*"]
   }
 }

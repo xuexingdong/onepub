@@ -10,6 +10,7 @@ export default defineConfig({
         main: "src/main.tsx",
         background: "src/background.ts",
         xhs: "src/xhs.ts",
+        x: "src/x.ts",
         content: "src/content.ts",
       },
       output: {

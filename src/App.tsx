@@ -8,6 +8,7 @@ function App() {
     "https://sns-avatar-qc.xhscdn.com/avatar/1040g2jo31c589sekgk6g5p9cketqo4smatcmvog?imageView2/2/w/80/format/jpg",
     "https://sns-avatar-qc.xhscdn.com/avatar/1040g2jo31c589sekgk6g5p9cketqo4smatcmvog?imageView2/2/w/80/format/jpg", // 默认图片URL（简短且展示小型图片）
   ]);
+  const [platforms, setPlatforms] = useState<string[]>([]);
 
   const detectExtension = () => {
     if (!chrome.runtime) {
@@ -42,6 +43,13 @@ function App() {
     const input = e.target as HTMLTextAreaElement;
     const urls = input.value.split(/[\s\n]/).filter((url) => url.trim() !== "");
     setFiles(urls);
+  };
+
+  const handlePlatformChange = (platform: string, checked: boolean) => {
+    const newPlatforms = checked
+      ? [...platforms, platform]
+      : platforms.filter((p) => p !== platform);
+    setPlatforms(newPlatforms);
   };
 
   return (
@@ -85,9 +93,20 @@ function App() {
             onChange={handleFileChange}
           />
         </div>
+        <fieldset>
+          <div>
+            <input type="checkbox" id="xhs" name="platforms" />
+            <label htmlFor="xhs">小红书</label>
+          </div>
+          <div>
+            <input type="checkbox" id="x" name="platforms" />
+            <label htmlFor="x">X</label>
+          </div>
+        </fieldset>
+
         <div className="button-group">
           <button className="submit-button" onClick={detectExtension}>
-            发布小红书
+            发布
           </button>
         </div>
       </div>
