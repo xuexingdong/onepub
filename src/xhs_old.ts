@@ -1,5 +1,25 @@
-class XhsStrategy implements PlatformStrategy {
-  waitForElement = (
+export {};
+
+(async () => {
+  chrome.runtime.onMessage.addListener(async (message, _, sendResponse) => {
+    console.log(message);
+    try {
+      await waitForElement(".name-box");
+      await waitForElement(".creator-tab");
+      await clickCreatorTab();
+      await simulateFileUpload(message.imgs);
+      await fillTitle(message.title);
+      await fillContent(message.content);
+      await saveDraft();
+      sendResponse(true);
+    } catch (error) {
+      console.error("流程执行失败:", error);
+      sendResponse(false);
+    }
+    return true;
+  });
+
+  const waitForElement = (
     selector: string,
     condition?: (element: HTMLElement) => boolean,
     timeout: number = 30 * 1000
@@ -32,7 +52,7 @@ class XhsStrategy implements PlatformStrategy {
     });
   };
 
-  waitForCondition = (
+  const waitForCondition = (
     condition: () => boolean,
     timeout: number = 30 * 1000
   ): Promise<boolean> => {
@@ -58,14 +78,14 @@ class XhsStrategy implements PlatformStrategy {
     });
   };
 
-  clickCreatorTab = async () => {
+  const clickCreatorTab = async () => {
     const creatorTabs =
       document.querySelectorAll<HTMLDivElement>(".creator-tab");
     const creatorTab = creatorTabs[creatorTabs.length - 1];
     creatorTab.click();
   };
 
-  loadFiles = async (urls: string[]) => {
+  const loadFiles = async (urls: string[]) => {
     return Promise.all(
       urls.map(async (url) => {
         const response = await fetch(url);
@@ -77,18 +97,16 @@ class XhsStrategy implements PlatformStrategy {
     );
   };
 
-  simulateFileUpload = async (imgs: string[]) => {
-    const files = await this.loadFiles(imgs);
-    const input = (await this.waitForElement(
-      ".upload-input"
-    )) as HTMLInputElement;
+  const simulateFileUpload = async (imgs: string[]) => {
+    const files = await loadFiles(imgs);
+    const input = (await waitForElement(".upload-input")) as HTMLInputElement;
 
     const dataTransfer = new DataTransfer();
     files.forEach((file) => dataTransfer.items.add(file));
     input.files = dataTransfer.files;
     input.dispatchEvent(new Event("change", { bubbles: true }));
 
-    await this.waitForCondition(() => {
+    await waitForCondition(() => {
       const formatImgs = document.querySelectorAll<HTMLElement>(
         ".img-preview-area .format-img"
       );
@@ -102,12 +120,12 @@ class XhsStrategy implements PlatformStrategy {
     });
   };
 
-  fillTitle = async (title: string) => {
-    const titleInput = await this.waitForElement(".titleInput input");
+  const fillTitle = async (title: string) => {
+    const titleInput = await waitForElement(".titleInput input");
     const input = titleInput as HTMLInputElement;
     input.value = title;
     input.dispatchEvent(new Event("input", { bubbles: true }));
-    await this.waitForCondition(() => {
+    await waitForCondition(() => {
       return (
         document.querySelector<HTMLInputElement>(".titleInput input")?.value ===
         title
@@ -115,11 +133,11 @@ class XhsStrategy implements PlatformStrategy {
     });
   };
 
-  fillContent = async (content: string) => {
-    const p = await this.waitForElement("#quillEditor p");
+  const fillContent = async (content: string) => {
+    const p = await waitForElement("#quillEditor p");
     p.innerHTML = content;
     p.dispatchEvent(new Event("input", { bubbles: true }));
-    await this.waitForCondition(() => {
+    await waitForCondition(() => {
       return (
         document.querySelector<HTMLParagraphElement>("#quillEditor p")
           ?.textContent === content
@@ -127,40 +145,8 @@ class XhsStrategy implements PlatformStrategy {
     });
   };
 
-  saveDraft = async () => {
-    const saveDraftButton = await this.waitForElement(".cancelBtn");
+  const saveDraft = async () => {
+    const saveDraftButton = await waitForElement(".cancelBtn");
     saveDraftButton.click();
   };
-  getHomeUrl(): string {
-    return "https://creator.xiaohongshu.com/publish/publish";
-  }
-  isLoggedIn(tab: chrome.tabs.Tab): boolean {
-    if (!tab.url) {
-      return false;
-    }
-    return tab.url.includes("login");
-  }
-
-  async pub(
-    message: any,
-    _: chrome.runtime.MessageSender,
-    sendResponse: (response?: any) => void
-  ): Promise<void> {
-    console.log(message);
-    try {
-      await this.waitForElement(".name-box");
-      await this.waitForElement(".creator-tab");
-      await this.clickCreatorTab();
-      await this.simulateFileUpload(message.imgs);
-      await this.fillTitle(message.title);
-      await this.fillContent(message.content);
-      await this.saveDraft();
-      sendResponse(true);
-    } catch (error) {
-      console.error("流程执行失败:", error);
-      sendResponse(false);
-    }
-  }
-}
-
-export default XhsStrategy;
+})();
